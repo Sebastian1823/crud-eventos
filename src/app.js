@@ -23,9 +23,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/organizadores', organizadoresRoutes);
 app.use('/eventos', eventosRoutes);
 
-// Ruta raíz redirige a eventos
-app.get('/', (req, res) => {
-  res.redirect('/eventos');
+// Ruta raíz — Home pública
+const pool = require('./config/db');
+app.get('/', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT e.id_evento, e.titulo, e.fecha, e.afiche, o.nombre AS nombre_organizador
+       FROM eventos e
+       JOIN organizadores o USING(id_organizador)
+       ORDER BY e.fecha ASC`
+    );
+    res.render('home', { eventos: result.rows });
+  } catch (error) {
+    console.error('Error al cargar home:', error);
+    res.render('home', { eventos: [] });
+  }
 });
 
 // Manejo de error 404

@@ -11,7 +11,7 @@
             <div class="card-body p-4">
                 <form action="/eventos/<%= evento.id_evento %>?_method=PUT" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="titulo" class="form-label">Título del Evento</label>
+                        <label for="titulo" class="form-label">Titulo del Evento</label>
                         <input type="text" class="form-control" id="titulo" name="titulo" value="<%= evento.titulo %>" required>
                     </div>
                     <div class="mb-3">
@@ -51,7 +51,7 @@
                     <div class="mb-4">
                         <label for="afiche" class="form-label">Subir Nueva Imagen (opcional)</label>
                         <input type="file" class="form-control" id="afiche" name="afiche" accept="image/*">
-                        <div class="form-text">Si sube una nueva imagen, reemplazará la actual</div>
+                        <div class="form-text">Si sube una nueva imagen, reemplazara la actual</div>
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary py-2">

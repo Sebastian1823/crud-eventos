@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 EventosPro — Descubre los próximos eventos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #050816; color: #e2e8f0; overflow-x: hidden; }
+
+        /* ═══════ HERO ═══════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #050816 0%, #0a1628 30%, #0d1f3c 60%, #050816 100%);
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 25% 40%, rgba(79, 109, 245, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 60%, rgba(124, 58, 237, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 90%, rgba(34, 211, 238, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-content { position: relative; z-index: 10; }
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #4f6df5, #22d3ee, #c084fc, #4f6df5);
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 6s ease-in-out infinite;
+        }
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .hero-subtitle {
+            font-size: 1.35rem;
+            color: rgba(136, 146, 176, 0.9);
+            font-weight: 400;
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.5px;
+        }
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #4f6df5, #7c3aed);
+            color: #fff;
+            border: none;
+            padding: 0.85rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(79, 109, 245, 0.3);
+            text-decoration: none;
+        }
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(79, 109, 245, 0.45);
+            color: #fff;
+        }
+        .btn-hero-secondary {
+            background: transparent;
+            color: rgba(136, 146, 176, 0.9);
+            border: 1px solid rgba(136, 146, 176, 0.25);
+            padding: 0.85rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-hero-secondary:hover {
+            border-color: rgba(79, 109, 245, 0.5);
+            color: #e2e8f0;
+            background: rgba(79, 109, 245, 0.06);
+            transform: translateY(-3px);
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s ease-in-out infinite;
+            color: rgba(79, 109, 245, 0.5);
+            font-size: 1.5rem;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ═══════ STARS CANVAS ═══════ */
+        #hero-stars {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ═══════ EVENTS SECTION ═══════ */
+        .events-section {
+            padding: 5rem 0;
+            background: linear-gradient(180deg, #050816 0%, #0a0e1a 100%);
+            min-height: 60vh;
+        }
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: rgba(136, 146, 176, 0.7);
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        /* ═══════ EVENT CARDS ═══════ */
+        .event-card {
+            background: rgba(13, 16, 37, 0.8);
+            border: 1px solid rgba(79, 109, 245, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+        .event-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(79, 109, 245, 0.12), 0 0 0 1px rgba(79, 109, 245, 0.15);
+        }
+        .event-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(79, 109, 245, 0.06);
+        }
+        .event-card .no-image {
+            height: 200px;
+            background: linear-gradient(135deg, rgba(17, 22, 49, 0.9), rgba(13, 16, 37, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(136, 146, 176, 0.3);
+            font-size: 3rem;
+            border-bottom: 1px solid rgba(79, 109, 245, 0.06);
+        }
+        .event-card .card-body {
+            padding: 1.5rem;
+        }
+        .event-card .card-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #e2e8f0;
+            margin-bottom: 0.8rem;
+        }
+        .event-card .event-date {
+            color: rgba(136, 146, 176, 0.8);
+            font-size: 0.88rem;
+            margin-bottom: 0.5rem;
+        }
+        .event-card .event-organizer {
+            color: rgba(136, 146, 176, 0.65);
+            font-size: 0.85rem;
+        }
+        .badge-proximo {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 214, 160, 0.1));
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .badge-finalizado {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1));
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* ═══════ EMPTY STATE ═══════ */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: rgba(136, 146, 176, 0.6);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+        /* ═══════ FOOTER ═══════ */
+        .home-footer {
+            background: rgba(5, 8, 22, 0.95);
+            border-top: 1px solid rgba(79, 109, 245, 0.06);
+            padding: 2rem 0;
+            text-align: center;
+            color: rgba(136, 146, 176, 0.5);
+            font-size: 0.85rem;
+        }
+
+        /* ═══════ ANIMATIONS ═══════ */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out both;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+
+        /* ═══════ RESPONSIVE ═══════ */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.8rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+        }
+        @media (max-width: 576px) {
+            .hero-title { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════ HERO SECTION ═══════ -->
+    <section class="hero">
+        <canvas id="hero-stars"></canvas>
+        <div class="hero-content">
+            <h1 class="hero-title fade-in-up">🎭 EventosPro</h1>
+            <p class="hero-subtitle fade-in-up delay-1">Descubre los próximos eventos</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap fade-in-up delay-2">
+                <a href="#eventos" class="btn-hero-primary">
+                    <i class="bi bi-calendar-event me-2"></i>Ver eventos
+                </a>
+                <a href="/eventos" class="btn-hero-secondary">
+                    <i class="bi bi-gear me-2"></i>Administrar
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="bi bi-chevron-double-down"></i>
+        </div>
+    </section>
+
+    <!-- ═══════ EVENTS SECTION ═══════ -->
+    <section class="events-section" id="eventos">
+        <div class="container">
+            <h2 class="section-title">Próximos Eventos</h2>
+            <p class="section-subtitle">Explora todos los eventos organizados</p>
+
+            <% if (eventos.length === 0) { %>
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <h5>No hay eventos registrados aún</h5>
+                    <p>Vuelve pronto para descubrir nuevos eventos.</p>
+                </div>
+            <% } else { %>
+                <div class="row g-4">
+                    <% eventos.forEach((evento, index) => { %>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="event-card fade-in-up delay-<%= Math.min(index + 1, 6) %>">
+                                <% if (evento.afiche) { %>
+                                    <img src="<%= evento.afiche %>" class="card-img-top" alt="<%= evento.titulo %>">
+                                <% } else { %>
+                                    <div class="no-image">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                <% } %>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0"><%= evento.titulo %></h5>
+                                        <% const hoy = new Date(); const fechaEvento = new Date(evento.fecha); %>
+                                        <% if (fechaEvento < hoy) { %>
+                                            <span class="badge-finalizado">Finalizado</span>
+                                        <% } else { %>
+                                            <span class="badge-proximo">Próximo</span>
+                                        <% } %>
+                                    </div>
+                                    <p class="event-date">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        <%= fechaEvento.toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                    </p>
+                                    <p class="event-organizer mb-0">
+                                        <i class="bi bi-person me-1"></i>
+                                        <%= evento.nombre_organizador %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer class="home-footer">
+        <p class="mb-0">EventosPro &copy; 2025 — Todos los derechos reservados</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Stars animation
+        (function() {
+            var canvas = document.getElementById('hero-stars');
+            var ctx = canvas.getContext('2d');
+            var stars = [];
+
+            function resize() {
+                canvas.width = canvas.parentElement.offsetWidth;
+                canvas.height = canvas.parentElement.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (var i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.4 + 0.2,
+                    a: Math.random() * 0.7 + 0.2,
+                    s: Math.random() * 0.005 + 0.002,
+                    p: Math.random() * Math.PI * 2,
+                    c: Math.random() > 0.7 ? '79,109,245' : Math.random() > 0.5 ? '34,211,238' : '226,232,240'
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                var t = Date.now() * 0.001;
+                for (var i = 0; i < stars.length; i++) {
+                    var s = stars[i];
+                    var tw = Math.sin(t * s.s * 200 + s.p) * 0.3 + 0.7;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(' + s.c + ',' + (s.a * tw) + ')';
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+</body>
+</html>
