@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="main-content">
+  <div class="container-fluid px-4 py-4">
+
+    <% if (error) { %>
+    <div class="alert alert-danger alert-dismissible alert-auto-dismiss d-flex align-items-center gap-2">
+      <i class="bi bi-exclamation-circle-fill"></i> <%= error %>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <a href="/organizadores" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <div>
+        <h4 class="fw-bold text-dark mb-0">
+          <i class="bi bi-pencil-fill text-warning me-2"></i>Editar Organizador
+        </h4>
+        <p class="text-muted mb-0 small">Modifica los datos del organizador</p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <form action="/organizadores/<%= organizador.id_organizador %>?_method=PUT"
+                  method="POST" novalidate>
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">
+                  Nombre <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="bi bi-person text-muted"></i>
+                  </span>
+                  <input type="text" name="nombre" class="form-control"
+                         value="<%= organizador.nombre %>" required maxlength="100">
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-medium">
+                  Teléfono <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    <i class="bi bi-telephone text-muted"></i>
+                  </span>
+                  <input type="text" name="telefono" class="form-control"
+                         value="<%= organizador.telefono %>" required maxlength="20">
+                </div>
+              </div>
+
+              <hr class="mb-4">
+
+              <div class="d-flex gap-3 justify-content-end">
+                <a href="/organizadores" class="btn btn-outline-secondary">
+                  <i class="bi bi-x-circle me-1"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-warning px-4 text-dark fw-semibold">
+                  <i class="bi bi-floppy-fill me-1"></i>Actualizar
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
