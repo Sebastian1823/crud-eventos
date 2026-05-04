@@ -1,0 +1,140 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="main-content">
+  <div class="container-fluid px-4 py-4">
+
+    <!-- Alertas -->
+    <% if (success) { %>
+    <div class="alert alert-success alert-dismissible alert-auto-dismiss d-flex align-items-center gap-2 mb-4">
+      <i class="bi bi-check-circle-fill"></i> <%= success %>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <!-- Page header -->
+    <div class="page-header mb-4">
+      <h4 class="fw-bold text-dark mb-1">
+        <i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard
+      </h4>
+      <p class="text-muted mb-0">Bienvenido de vuelta, <strong><%= user.username %></strong></p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-card-primary">
+          <div class="stat-icon">
+            <i class="bi bi-calendar3"></i>
+          </div>
+          <div class="stat-info">
+            <h2 class="stat-number"><%= totalEventos %></h2>
+            <p class="stat-label">Total Eventos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-card-success">
+          <div class="stat-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stat-info">
+            <h2 class="stat-number"><%= totalOrganizadores %></h2>
+            <p class="stat-label">Organizadores</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-card-warning">
+          <div class="stat-icon">
+            <i class="bi bi-image-fill"></i>
+          </div>
+          <div class="stat-info">
+            <h2 class="stat-number">✓</h2>
+            <p class="stat-label">Cloudinary Activo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-card-info">
+          <div class="stat-icon">
+            <i class="bi bi-shield-check-fill"></i>
+          </div>
+          <div class="stat-info">
+            <h2 class="stat-number">✓</h2>
+            <p class="stat-label">Sesión Segura</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-semibold mb-0 d-flex align-items-center gap-2">
+              <i class="bi bi-lightning-fill text-warning"></i> Acciones Rápidas
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-3">
+              <a href="/eventos/crear" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle-fill"></i> Nuevo Evento
+              </a>
+              <a href="/organizadores/crear" class="btn btn-success d-flex align-items-center gap-2">
+                <i class="bi bi-person-plus-fill"></i> Nuevo Organizador
+              </a>
+              <a href="/eventos" class="btn btn-outline-primary d-flex align-items-center gap-2">
+                <i class="bi bi-list-ul"></i> Ver todos los Eventos
+              </a>
+              <a href="/organizadores" class="btn btn-outline-success d-flex align-items-center gap-2">
+                <i class="bi bi-people"></i> Ver todos los Organizadores
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-semibold mb-0 d-flex align-items-center gap-2">
+              <i class="bi bi-info-circle-fill text-info"></i> Información del Sistema
+            </h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <span class="badge bg-success rounded-pill">✓</span>
+                Backend: <strong>Express.js</strong>
+              </li>
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <span class="badge bg-success rounded-pill">✓</span>
+                Base de datos: <strong>PostgreSQL (Render)</strong>
+              </li>
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <span class="badge bg-success rounded-pill">✓</span>
+                Imágenes: <strong>Cloudinary</strong>
+              </li>
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <span class="badge bg-success rounded-pill">✓</span>
+                Autenticación: <strong>Express Session + bcrypt</strong>
+              </li>
+              <li class="list-group-item d-flex align-items-center gap-2 px-0">
+                <span class="badge bg-success rounded-pill">✓</span>
+                Vista: <strong>EJS + Bootstrap 5</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
