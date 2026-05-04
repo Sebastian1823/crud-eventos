@@ -47,19 +47,26 @@ const postLogin = async (req, res) => {
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const getDashboard = async (req, res) => {
   try {
-    const [eventos, organizadores] = await Promise.all([
+    const [eventosCount, organizadoresCount, recientes] = await Promise.all([
       pool.query('SELECT COUNT(*) FROM eventos'),
-      pool.query('SELECT COUNT(*) FROM organizadores')
+      pool.query('SELECT COUNT(*) FROM organizadores'),
+      pool.query(`
+        SELECT e.*, o.nombre AS nombre_organizador
+        FROM eventos e
+        LEFT JOIN organizadores o ON e.id_organizador = o.id_organizador
+        ORDER BY e.id_evento DESC LIMIT 5
+      `)
     ]);
 
     res.render('dashboard', {
       title: 'Dashboard',
-      totalEventos: eventos.rows[0].count,
-      totalOrganizadores: organizadores.rows[0].count
+      totalEventos: eventosCount.rows[0].count,
+      totalOrganizadores: organizadoresCount.rows[0].count,
+      eventosRecientes: recientes.rows
     });
   } catch (err) {
     console.error(err);
-    res.render('dashboard', { title: 'Dashboard', totalEventos: 0, totalOrganizadores: 0 });
+    res.render('dashboard', { title: 'Dashboard', totalEventos: 0, totalOrganizadores: 0, eventosRecientes: [] });
   }
 };
 
