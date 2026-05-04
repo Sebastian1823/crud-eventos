@@ -1,0 +1,35 @@
+<%- include('../partials/header') %>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header py-3">
+                <h4 class="mb-0 text-center" style="font-weight:700;">
+                    <i class="bi bi-pencil-square me-2" style="color: #f59e0b;"></i>Editar Organizador
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="/organizadores/<%= organizador.id_organizador %>?_method=PUT" method="POST">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="<%= organizador.nombre %>" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" name="telefono" value="<%= organizador.telefono %>" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2">
+                            <i class="bi bi-check-lg me-1"></i> Actualizar
+                        </button>
+                        <a href="/organizadores" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

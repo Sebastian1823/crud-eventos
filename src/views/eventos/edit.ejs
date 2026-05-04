@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card">
+            <div class="card-header py-3">
+                <h4 class="mb-0 text-center" style="font-weight:700;">
+                    <i class="bi bi-pencil-square me-2" style="color: #f59e0b;"></i>Editar Evento
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="/eventos/<%= evento.id_evento %>?_method=PUT" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título del Evento</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" value="<%= evento.titulo %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <%
+                            const fechaObj = new Date(evento.fecha);
+                            const yyyy = fechaObj.getFullYear();
+                            const mm = String(fechaObj.getMonth() + 1).padStart(2, '0');
+                            const dd = String(fechaObj.getDate()).padStart(2, '0');
+                            const fechaFormateada = yyyy + '-' + mm + '-' + dd;
+                        %>
+                        <input type="date" class="form-control" id="fecha" name="fecha" value="<%= fechaFormateada %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_organizador" class="form-label">Organizador</label>
+                        <select class="form-select" id="id_organizador" name="id_organizador" required>
+                            <option value="" disabled>Seleccione un organizador</option>
+                            <% organizadores.forEach(org => { %>
+                                <option value="<%= org.id_organizador %>" <%= org.id_organizador === evento.id_organizador ? 'selected' : '' %>><%= org.nombre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Afiche Actual</label>
+                        <% if (evento.afiche) { %>
+                            <div class="mb-2 p-3 text-center" style="background: rgba(79,109,245,0.04); border-radius:12px; border: 1px dashed rgba(79,109,245,0.15);">
+                                <img src="<%= evento.afiche %>" alt="Afiche actual" class="img-thumbnail-custom" style="max-width: 200px;">
+                            </div>
+                            <input type="hidden" name="afiche_actual" value="<%= evento.afiche %>">
+                        <% } else { %>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary"><i class="bi bi-image me-1"></i>Sin imagen actual</span>
+                            </div>
+                            <input type="hidden" name="afiche_actual" value="">
+                        <% } %>
+                    </div>
+                    <div class="mb-4">
+                        <label for="afiche" class="form-label">Subir Nueva Imagen (opcional)</label>
+                        <input type="file" class="form-control" id="afiche" name="afiche" accept="image/*">
+                        <div class="form-text">Si sube una nueva imagen, reemplazará la actual</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2">
+                            <i class="bi bi-check-lg me-1"></i> Actualizar
+                        </button>
+                        <a href="/eventos" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
