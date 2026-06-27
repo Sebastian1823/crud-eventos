@@ -4,13 +4,13 @@ const eventosController = {
   // GET /eventos — Listar todos los eventos
   index: async (req, res) => {
     try {
-      const result = await pool.query(
+      const [rows] = await pool.query(
         `SELECT e.*, o.nombre AS nombre_organizador
          FROM eventos e
          JOIN organizadores o USING(id_organizador)
          ORDER BY e.fecha DESC`
       );
-      res.render('eventos/index', { eventos: result.rows });
+      res.render('eventos/index', { eventos: rows });
     } catch (error) {
       console.error('Error al obtener eventos:', error);
       res.status(500).send('Error interno del servidor');
@@ -20,8 +20,8 @@ const eventosController = {
   // GET /eventos/create — Mostrar formulario de creación
   createForm: async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM organizadores ORDER BY nombre');
-      res.render('eventos/create', { organizadores: result.rows });
+      const [rows] = await pool.query('SELECT * FROM organizadores ORDER BY nombre');
+      res.render('eventos/create', { organizadores: rows });
     } catch (error) {
       console.error('Error al cargar formulario:', error);
       res.status(500).send('Error interno del servidor');
@@ -40,7 +40,7 @@ const eventosController = {
       const afiche = req.file ? req.file.path : null;
 
       await pool.query(
-        'INSERT INTO eventos (titulo, fecha, afiche, id_organizador) VALUES ($1, $2, $3, $4)',
+        'INSERT INTO eventos (titulo, fecha, afiche, id_organizador) VALUES (?, ?, ?, ?)',
         [titulo.trim(), fecha, afiche, id_organizador]
       );
 
@@ -56,22 +56,22 @@ const eventosController = {
     try {
       const { id } = req.params;
 
-      const eventoResult = await pool.query(
-        'SELECT * FROM eventos WHERE id_evento = $1',
+      const [eventoRows] = await pool.query(
+        'SELECT * FROM eventos WHERE id_evento = ?',
         [id]
       );
 
-      if (eventoResult.rows.length === 0) {
+      if (eventoRows.length === 0) {
         return res.redirect('/eventos');
       }
 
-      const organizadoresResult = await pool.query(
+      const [organizadoresRows] = await pool.query(
         'SELECT * FROM organizadores ORDER BY nombre'
       );
 
       res.render('eventos/edit', {
-        evento: eventoResult.rows[0],
-        organizadores: organizadoresResult.rows
+        evento: eventoRows[0],
+        organizadores: organizadoresRows
       });
     } catch (error) {
       console.error('Error al cargar formulario de edición:', error);
@@ -97,7 +97,7 @@ const eventosController = {
       }
 
       await pool.query(
-        'UPDATE eventos SET titulo = $1, fecha = $2, afiche = $3, id_organizador = $4 WHERE id_evento = $5',
+        'UPDATE eventos SET titulo = ?, fecha = ?, afiche = ?, id_organizador = ? WHERE id_evento = ?',
         [titulo.trim(), fecha, afiche, id_organizador, id]
       );
 
@@ -113,7 +113,7 @@ const eventosController = {
     try {
       const { id } = req.params;
       await pool.query(
-        'DELETE FROM eventos WHERE id_evento = $1',
+        'DELETE FROM eventos WHERE id_evento = ?',
         [id]
       );
       res.redirect('/eventos');

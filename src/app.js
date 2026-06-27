@@ -27,13 +27,13 @@ app.use('/eventos', eventosRoutes);
 const pool = require('./config/db');
 app.get('/', async (req, res) => {
   try {
-    const result = await pool.query(
+    const [rows] = await pool.query(
       `SELECT e.id_evento, e.titulo, e.fecha, e.afiche, o.nombre AS nombre_organizador
        FROM eventos e
        JOIN organizadores o USING(id_organizador)
        ORDER BY e.fecha ASC`
     );
-    res.render('home', { eventos: result.rows });
+    res.render('home', { eventos: rows });
   } catch (error) {
     console.error('Error al cargar home:', error);
     res.render('home', { eventos: [] });

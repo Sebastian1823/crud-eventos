@@ -7,6 +7,7 @@ const methodOverride = require('method-override');
 const authRoutes = require('./src/routes/authRoutes');
 const eventosRoutes = require('./src/routes/eventosRoutes');
 const organizadoresRoutes = require('./src/routes/organizadoresRoutes');
+const pool = require('./src/config/db');
 
 const app = express();
 

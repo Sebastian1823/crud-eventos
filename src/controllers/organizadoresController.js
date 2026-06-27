@@ -4,8 +4,8 @@ const organizadoresController = {
   // GET /organizadores — Listar todos los organizadores
   index: async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM organizadores ORDER BY id_organizador ASC');
-      res.render('organizadores/index', { organizadores: result.rows });
+      const [rows] = await pool.query('SELECT * FROM organizadores ORDER BY id_organizador ASC');
+      res.render('organizadores/index', { organizadores: rows });
     } catch (error) {
       console.error('Error al obtener organizadores:', error);
       res.status(500).send('Error interno del servidor');
@@ -32,7 +32,7 @@ const organizadoresController = {
       }
 
       await pool.query(
-        'INSERT INTO organizadores (nombre, telefono) VALUES ($1, $2)',
+        'INSERT INTO organizadores (nombre, telefono) VALUES (?, ?)',
         [nombre.trim(), telefono.trim()]
       );
 
@@ -47,16 +47,16 @@ const organizadoresController = {
   editForm: async (req, res) => {
     try {
       const { id } = req.params;
-      const result = await pool.query(
-        'SELECT * FROM organizadores WHERE id_organizador = $1',
+      const [rows] = await pool.query(
+        'SELECT * FROM organizadores WHERE id_organizador = ?',
         [id]
       );
 
-      if (result.rows.length === 0) {
+      if (rows.length === 0) {
         return res.redirect('/organizadores');
       }
 
-      res.render('organizadores/edit', { organizador: result.rows[0] });
+      res.render('organizadores/edit', { organizador: rows[0] });
     } catch (error) {
       console.error('Error al cargar formulario de edición:', error);
       res.status(500).send('Error interno del servidor');
@@ -74,7 +74,7 @@ const organizadoresController = {
       }
 
       await pool.query(
-        'UPDATE organizadores SET nombre = $1, telefono = $2 WHERE id_organizador = $3',
+        'UPDATE organizadores SET nombre = ?, telefono = ? WHERE id_organizador = ?',
         [nombre.trim(), telefono.trim(), id]
       );
 
@@ -90,7 +90,7 @@ const organizadoresController = {
     try {
       const { id } = req.params;
       await pool.query(
-        'DELETE FROM organizadores WHERE id_organizador = $1',
+        'DELETE FROM organizadores WHERE id_organizador = ?',
         [id]
       );
       res.redirect('/organizadores');

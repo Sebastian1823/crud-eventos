@@ -17,16 +17,16 @@ const postLogin = async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      'SELECT * FROM usuarios WHERE username = $1', [username]
+    const [rows] = await pool.query(
+      'SELECT * FROM usuarios WHERE username = ?', [username]
     );
 
-    if (result.rows.length === 0) {
+    if (rows.length === 0) {
       req.session.error = 'Usuario o contraseña incorrectos.';
       return res.redirect('/login');
     }
 
-    const user = result.rows[0];
+    const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
@@ -47,7 +47,7 @@ const postLogin = async (req, res) => {
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 const getDashboard = async (req, res) => {
   try {
-    const [eventosCount, organizadoresCount, recientes] = await Promise.all([
+    const [[eventosCount], [organizadoresCount], [recientes]] = await Promise.all([
       pool.query('SELECT COUNT(*) FROM eventos'),
       pool.query('SELECT COUNT(*) FROM organizadores'),
       pool.query(`
@@ -60,9 +60,9 @@ const getDashboard = async (req, res) => {
 
     res.render('dashboard', {
       title: 'Dashboard',
-      totalEventos: eventosCount.rows[0].count,
-      totalOrganizadores: organizadoresCount.rows[0].count,
-      eventosRecientes: recientes.rows
+      totalEventos: eventosCount[0]['COUNT(*)'],
+      totalOrganizadores: organizadoresCount[0]['COUNT(*)'],
+      eventosRecientes: recientes
     });
   } catch (err) {
     console.error(err);
@@ -87,12 +87,12 @@ const postRegistro = async (req, res) => {
   try {
     const hashed = await bcrypt.hash(password, 10);
     await pool.query(
-      'INSERT INTO usuarios (username, password) VALUES ($1, $2)', [username, hashed]
+      'INSERT INTO usuarios (username, password) VALUES (?, ?)', [username, hashed]
     );
     req.session.success = 'Usuario creado. Ya puedes iniciar sesión.';
     res.redirect('/login');
   } catch (err) {
-    if (err.code === '23505') {
+    if (err.code === 'ER_DUP_ENTRY') {
       req.session.error = 'Ese nombre de usuario ya existe.';
     } else {
       req.session.error = 'Error al crear usuario.';
