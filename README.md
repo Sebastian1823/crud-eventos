@@ -1,6 +1,6 @@
 # 🎭 GestorEventos — CRUD de Eventos y Organizadores
 
-Sistema web de administración de eventos y organizadores desarrollado con **Node.js**, **Express.js**, **PostgreSQL**, **EJS** y **Bootstrap 5**. Permite crear, leer, actualizar y eliminar eventos con subida de afiches a **Cloudinary**.
+Sistema web de administración de eventos y organizadores desarrollado con **Node.js**, **Express.js**, **MySQL**, **EJS** y **Bootstrap 5**. Incluye autenticación de usuarios, panel de administración (dashboard) y subida de afiches a **Cloudinary**.
 
 ---
 
@@ -8,53 +8,144 @@ Sistema web de administración de eventos y organizadores desarrollado con **Nod
 
 | Tecnología | Uso |
 |---|---|
+| **Node.js** | Entorno de ejecución del servidor |
 | **Express.js** | Framework backend para Node.js |
-| **PostgreSQL** | Base de datos relacional |
+| **MySQL** | Base de datos relacional |
+| **mysql2** | Driver MySQL con soporte para Promises |
 | **EJS** | Motor de plantillas para las vistas |
+| **bcryptjs** | Encriptación de contraseñas |
+| **express-session** | Manejo de sesiones de usuario |
 | **Multer** | Middleware para subida de archivos |
 | **Cloudinary** | Almacenamiento de imágenes en la nube |
 | **Bootstrap 5** | Framework CSS para el diseño responsive |
 | **method-override** | Soporte para métodos PUT y DELETE en formularios HTML |
+| **dotenv** | Variables de entorno desde archivo `.env` |
+| **nodemon** | Reinicio automático en desarrollo |
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```
-eventos-crud/
-├── src/
-│   ├── app.js
-│   ├── config/
-│   │   ├── db.js
-│   │   └── cloudinary.js
-│   ├── controllers/
-│   │   ├── organizadoresController.js
-│   │   └── eventosController.js
-│   ├── routes/
-│   │   ├── organizadoresRoutes.js
-│   │   └── eventosRoutes.js
-│   ├── middleware/
-│   │   └── upload.js
-│   └── views/
-│       ├── partials/
-│       │   ├── header.ejs
-│       │   └── footer.ejs
-│       ├── organizadores/
-│       │   ├── index.ejs
-│       │   ├── create.ejs
-│       │   └── edit.ejs
-│       └── eventos/
-│           ├── index.ejs
-│           ├── create.ejs
-│           └── edit.ejs
-├── public/
-│   └── uploads/
-├── database.sql
-├── .env.example
-├── .gitignore
+crud-eventos/
+├── app.js                              ← Punto de entrada principal
 ├── package.json
-└── README.md
+├── database.sql                        ← Script SQL para crear las tablas
+├── .env                                ← Variables de entorno (no se sube a Git)
+├── .gitignore
+├── README.md
+│
+├── public/
+│   ├── css/
+│   │   └── style.css                   ← Hoja de estilos principal
+│   └── uploads/
+│
+└── src/
+    ├── config/
+    │   ├── db.js                       ← Conexión a MySQL (pool)
+    │   └── cloudinary.js               ← Configuración de Cloudinary
+    │
+    ├── controllers/
+    │   ├── authController.js           ← Login, registro, dashboard, logout
+    │   ├── eventosController.js        ← CRUD de eventos
+    │   └── organizadoresController.js  ← CRUD de organizadores
+    │
+    ├── middleware/
+    │   ├── auth.js                     ← Verificación de sesión (requireAuth)
+    │   └── upload.js                   ← Configuración de Multer + Cloudinary
+    │
+    ├── routes/
+    │   ├── authRoutes.js               ← Rutas de autenticación
+    │   ├── eventosRoutes.js            ← Rutas de eventos
+    │   └── organizadoresRoutes.js      ← Rutas de organizadores
+    │
+    └── views/
+        ├── home.ejs                    ← Página pública de inicio
+        ├── dashboard.ejs               ← Panel de administración
+        ├── 404.ejs                     ← Página de error 404
+        ├── auth/
+        │   └── login.ejs               ← Formulario de login y registro
+        ├── eventos/
+        │   ├── index.ejs               ← Listado de eventos
+        │   ├── create.ejs              ← Formulario de creación
+        │   ├── edit.ejs                ← Formulario de edición
+        │   └── show.ejs                ← Detalle de evento
+        ├── organizadores/
+        │   ├── index.ejs               ← Listado de organizadores
+        │   ├── create.ejs              ← Formulario de creación
+        │   └── edit.ejs                ← Formulario de edición
+        └── partials/
+            ├── header.ejs              ← Cabecera y navegación
+            └── footer.ejs              ← Pie de página
 ```
+
+---
+
+## 🗄️ Base de Datos
+
+El proyecto utiliza **MySQL** con 3 tablas:
+
+### Tabla `organizadores`
+| Columna | Tipo | Descripción |
+|---------|------|-------------|
+| `id_organizador` | INT AUTO_INCREMENT | Clave primaria |
+| `nombre` | VARCHAR(150) | Nombre del organizador |
+| `telefono` | VARCHAR(20) | Teléfono de contacto |
+| `created_at` | TIMESTAMP | Fecha de creación |
+
+### Tabla `eventos`
+| Columna | Tipo | Descripción |
+|---------|------|-------------|
+| `id_evento` | INT AUTO_INCREMENT | Clave primaria |
+| `titulo` | VARCHAR(200) | Título del evento |
+| `fecha` | DATE | Fecha del evento |
+| `afiche` | VARCHAR(500) | URL del afiche en Cloudinary |
+| `id_organizador` | INT | FK → `organizadores(id_organizador)` |
+| `created_at` | TIMESTAMP | Fecha de creación |
+
+### Tabla `usuarios`
+| Columna | Tipo | Descripción |
+|---------|------|-------------|
+| `id_usuario` | INT AUTO_INCREMENT | Clave primaria |
+| `username` | VARCHAR(100) UNIQUE | Nombre de usuario |
+| `password` | VARCHAR(255) | Contraseña encriptada (bcrypt) |
+| `created_at` | TIMESTAMP | Fecha de creación |
+
+---
+
+## 🔀 Rutas
+
+### Autenticación
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/` | Redirige a `/dashboard` |
+| GET | `/login` | Formulario de login |
+| POST | `/login` | Procesar login |
+| GET | `/dashboard` | Panel con estadísticas 🔒 |
+| POST | `/registro` | Crear usuario admin |
+| GET | `/logout` | Cerrar sesión |
+
+### Eventos (`/eventos`)
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/eventos` | Listar todos los eventos |
+| GET | `/eventos/create` | Formulario de creación |
+| POST | `/eventos` | Guardar nuevo evento |
+| GET | `/eventos/:id/edit` | Formulario de edición |
+| PUT | `/eventos/:id` | Actualizar evento |
+| DELETE | `/eventos/:id` | Eliminar evento |
+
+### Organizadores (`/organizadores`)
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/organizadores` | Listar todos |
+| GET | `/organizadores/create` | Formulario de creación |
+| POST | `/organizadores` | Guardar nuevo |
+| GET | `/organizadores/:id/edit` | Formulario de edición |
+| PUT | `/organizadores/:id` | Actualizar |
+| DELETE | `/organizadores/:id` | Eliminar |
+
+> 🔒 Las rutas marcadas requieren autenticación (sesión activa).
 
 ---
 
@@ -63,8 +154,8 @@ eventos-crud/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/eventos-crud.git
-cd eventos-crud
+git clone https://github.com/tu-usuario/crud-eventos.git
+cd crud-eventos
 ```
 
 ### 2. Instalar dependencias
@@ -75,57 +166,60 @@ npm install
 
 ### 3. Configurar variables de entorno
 
-Crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+Crea un archivo `.env` en la raíz del proyecto:
 
 ```env
-DATABASE_URL=postgresql://usuario:password@host:5432/nombre_bd
+# ─── MySQL ─────────────────────────────────
+MYSQLHOST=localhost
+MYSQLPORT=3306
+MYSQLUSER=root
+MYSQLPASSWORD=tu_contraseña
+MYSQLDATABASE=crud_eventos
+
+# ─── Servidor ──────────────────────────────
+PORT=3000
+NODE_ENV=development
+SESSION_SECRET=clave_secreta_eventos_2024
+
+# ─── Cloudinary ────────────────────────────
 CLOUDINARY_CLOUD_NAME=tu_cloud_name
 CLOUDINARY_API_KEY=tu_api_key
 CLOUDINARY_API_SECRET=tu_api_secret
-NODE_ENV=development
-PORT=3000
 ```
 
-### 4. Ejecutar el script SQL en DBeaver
+### 4. Crear la base de datos y tablas
 
-Ver la sección siguiente para el paso a paso.
-
-### 5. Iniciar el servidor en modo desarrollo
+#### Opción A — Desde la terminal de MySQL
 
 ```bash
+mysql -u root -p
+```
+
+```sql
+CREATE DATABASE crud_eventos;
+USE crud_eventos;
+SOURCE database.sql;
+```
+
+#### Opción B — Desde MySQL Workbench o DBeaver
+
+1. Abre **MySQL Workbench** o **DBeaver** y conéctate a tu servidor MySQL.
+2. Crea una nueva base de datos llamada `crud_eventos`.
+3. Abre un nuevo editor SQL, copia y pega el contenido de `database.sql`.
+4. Ejecuta el script (`Ctrl + Enter` o botón ▶️).
+5. Verifica que las tablas `organizadores`, `eventos` y `usuarios` fueron creadas.
+
+### 5. Iniciar el servidor
+
+```bash
+# Modo desarrollo (con reinicio automático)
 npm run dev
+
+# Modo producción
+npm start
 ```
 
 El servidor estará disponible en `http://localhost:3000`
-
----
-
-## 🗄️ Cómo ejecutar database.sql en DBeaver
-
-### Paso a paso:
-
-1. **Abrir DBeaver** y conectarse a tu base de datos PostgreSQL (ya sea local o en Render).
-
-2. **Crear la conexión** (si no la tienes):
-   - Haz clic en **Nueva Conexión** → Selecciona **PostgreSQL**.
-   - Ingresa los datos de tu base de datos:
-     - **Host**: el host de Render (ej: `dpg-xxxxx.oregon-postgres.render.com`)
-     - **Port**: `5432`
-     - **Database**: nombre de tu base de datos
-     - **Username**: tu usuario
-     - **Password**: tu contraseña
-   - Haz clic en **Test Connection** para verificar y luego **Finalizar**.
-
-3. **Abrir el editor SQL**:
-   - Haz clic derecho en tu conexión → **Editor SQL** → **Nuevo editor SQL**.
-
-4. **Copiar y pegar** el contenido del archivo `database.sql` en el editor.
-
-5. **Ejecutar el script**:
-   - Selecciona todo el texto (`Ctrl + A`).
-   - Haz clic en el botón **Ejecutar** (▶️) o presiona `Ctrl + Enter`.
-
-6. **Verificar**: En el panel de navegación izquierdo, expande tu base de datos → **Schemas** → **public** → **Tables** para confirmar que las tablas `organizadores` y `eventos` fueron creadas correctamente.
 
 ---
 
@@ -137,39 +231,57 @@ El servidor estará disponible en `http://localhost:3000`
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/tu-usuario/eventos-crud.git
+git remote add origin https://github.com/tu-usuario/crud-eventos.git
 git push -u origin main
 ```
 
-### 2. Crear un Web Service en Render
+### 2. Crear una base de datos MySQL
+
+Usa un proveedor de MySQL en la nube como **Railway**, **PlanetScale**, **TiDB Cloud** o **Clever Cloud**. Obtén las credenciales de conexión (host, port, user, password, database).
+
+### 3. Crear un Web Service en Render
 
 1. Ingresa a [https://render.com](https://render.com) y haz login.
 2. Haz clic en **New** → **Web Service**.
 3. Conecta tu repositorio de GitHub.
 4. Configura los siguientes campos:
-   - **Name**: `eventos-crud`
+   - **Name**: `crud-eventos`
    - **Runtime**: `Node`
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
 
-### 3. Agregar Variables de Entorno
+### 4. Agregar Variables de Entorno
 
 En el dashboard del servicio en Render, ve a **Environment** y agrega:
 
 | Variable | Valor |
 |---|---|
-| `DATABASE_URL` | La URL de tu base de datos PostgreSQL en Render |
+| `MYSQLHOST` | Host de tu base de datos MySQL |
+| `MYSQLPORT` | Puerto (generalmente `3306`) |
+| `MYSQLUSER` | Usuario de la base de datos |
+| `MYSQLPASSWORD` | Contraseña de la base de datos |
+| `MYSQLDATABASE` | Nombre de la base de datos |
+| `SESSION_SECRET` | Una clave secreta para las sesiones |
 | `CLOUDINARY_CLOUD_NAME` | Tu cloud name de Cloudinary |
 | `CLOUDINARY_API_KEY` | Tu API key de Cloudinary |
 | `CLOUDINARY_API_SECRET` | Tu API secret de Cloudinary |
 | `NODE_ENV` | `production` |
 
-### 4. Deploy
+### 5. Deploy
 
 Render hará el deploy automáticamente al detectar cambios en el repositorio. El servicio estará disponible en la URL que Render te asigne.
 
 ---
 
+## 📌 Scripts Disponibles
+
+| Script | Comando | Descripción |
+|--------|---------|-------------|
+| `npm start` | `node src/app.js` | Inicia el servidor en producción |
+| `npm run dev` | `nodemon src/app.js` | Inicia con reinicio automático (desarrollo) |
+
+---
+
 ## 👤 Autor
 
-Proyecto desarrollado como práctica de desarrollo web con Node.js y PostgreSQL.
+Proyecto desarrollado como práctica de desarrollo web con Node.js y MySQL.
